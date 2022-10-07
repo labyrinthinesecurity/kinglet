@@ -14,11 +14,37 @@ Kinglet is a python3 script. The only module you might have to install is the z3
 
 By default, the INTERACTIVE variable is set to True, meaning that the good king will display a splash screen and ask you some questions. Since the first question is whether you want to run one of the tutorial described below, I strongly advise you to let it as it is.
 
+# Default constraints
+
+## Affinities
+
+Only two independent affinities are set by default: *aged* and *old*.
+
+Kinglet will do its best to run containers sharing the same affinity labels on the same nodes.
+
+## Anti-affinities
+
+4 pairs of anti-affinities are set by default:
+- *up* versus *down*
+- *black* versus *white*
+- *big* versus *small*
+- *close* versus *far*
+
+Any label in one pair can be freely combined with any label in another pair. For example, a container may be attached labels *black* and *down*.
+
+It is also possible to mix and match affinities and anti-affinities on a same container. For example, *up*, *close* and *old*.
+
+## Nodes size
+
+Each node can accomodate up to 10 containers. This maximum capacity is called the **node size**.
+
 # Tutorials
 
 When you run kinglet.py, enter numbers 1 to 4 to select one of the tutorials.
 
 ## Tutorial 1
+
+
 
 ## Tutorial 2
 
