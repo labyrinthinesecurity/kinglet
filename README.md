@@ -36,7 +36,7 @@ It is also possible to mix and match affinities and anti-affinities on a same co
 
 ## Nodes size
 
-Each node can accomodate up to 10 containers. This maximum capacity is called the **node size**.
+Each node can accomodate up to 10 containers. The maximum capacity a node can hold is called the **node size**.
 
 # Tutorials
 
@@ -44,7 +44,7 @@ When you run kinglet.py, enter numbers 1 to 4 to select one of the tutorials.
 
 ## Tutorial 1
 
-
+In this first tutorial, the cluster is configured with 4 nodes and 5 containers.
 
 ## Tutorial 2
 
