@@ -66,12 +66,12 @@ As opposed to my previous automated reasoning models, this one is dynamic: it is
 Affinity and size constraints are intricated, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
 In the code, intrication is materialized by propositional logic statements of the form:
 
-'''
+```
 Implies(And(affinity constraints), lower bound on Bitvector node capacity)
-'''
+```
 
 An early version of kinglet needed an exponential number of such formulas.
 With the introduction of an adder made of 2 log(n) bit registers (where n is the number of containers), kinglet now runs in linear time!
 All what this means is that kinglet may now reason about thousands of nodes and containers!
 
-
+![alt text](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
