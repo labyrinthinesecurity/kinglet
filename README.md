@@ -59,4 +59,19 @@ In this first tutorial, the cluster is configured with 4 nodes and 5 containers.
 
 ## Tutorial 4
 
-# Customization
+# Behind the scene
+
+As opposed to my previous automated reasoning models, this one is dynamic: it is built on the fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
+
+Affinity and size constraints are intricated, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
+In the code, intrication is materialized by propositional logic statements of the form:
+
+'''
+Implies(And(affinity constraints), lower bound on Bitvector node capacity)
+'''
+
+An early version of kinglet needed an exponential number of such formulas.
+With the introduction of an adder made of 2 log(n) bit registers (where n is the number of containers), kinglet now runs in linear time!
+All what this means is that kinglet may now reason about thousands of nodes and containers!
+
+
