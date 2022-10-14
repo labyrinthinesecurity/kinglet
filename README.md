@@ -4,7 +4,7 @@
 
 Let tiny king Godefroy The First guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages propositional logic to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
 
-Godefroy simulates how the scheduler part of a Kubernetes orchestrator distributes workloads over a cluster, in a provable way.
+Kinglet simulates how the scheduler part of a Kubernetes orchestrator distributes workloads over a cluster, in a provable way.
 
 # Installation
 
@@ -21,6 +21,8 @@ By default, the INTERACTIVE variable is set to True, meaning that the Good King 
 If you want to see how Kinglet constructs a SMT model on-the-fly and see the olutions found (if any!), set VERBOSE to True.
 
 ## Playing with the number of nodes and/or containers
+
+Set NODENUM to the number of nodes in the cluster, and CONTAINERNUM to the number of containers to schedule.
 
 # Default constraints
 
@@ -42,9 +44,6 @@ Any label in one pair can be freely combined with any label in another pair. For
 
 It is also possible to mix and match affinities and anti-affinities on a same container. For example, *up*, *close* and *old*.
 
-## Nodes size
-
-Each node can accomodate up to 10 containers. The maximum capacity a node can hold is called the **node size**.
 
 # Tutorials
 
