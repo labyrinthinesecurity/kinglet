@@ -116,6 +116,8 @@ Implies(And(containers[0].locations[1],containers[1].locations[1],containers[2].
 
 ### Alpha version
 
+**kinglet_II.py** improves on the above design by adding container locations together and placing a constraint on the bitwise sum rather than on every single combination of containers. 
+
 #### Logical adder
 
-![alt text](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
+![source www.101computing.net](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
