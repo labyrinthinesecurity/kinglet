@@ -96,6 +96,12 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 ## Bitvector for size constraints
 
-### Logical adder
+### Stable version
+
+In **kinglet_I.py**, each container has a list of n *self.location[]* BoolSort. So for each node it is easy to set a lowerbound on its capacity: we write as many Implies statements as there as possible combinations of 
+
+### Alpha version
+
+#### Logical adder
 
 ![alt text](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
