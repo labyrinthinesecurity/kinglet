@@ -9,6 +9,10 @@ Kinglet simulates how the scheduler part of a Kubernetes orchestrator distribute
 # Installation
 
 Kinglet is a python3 script. For most of us, the only module one might have to install is the z3 module... Very simple!
+The scrip comes in two flavours:
+
+* The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
+* THe next verion, **kinglet_II.py** is currently in alpha. It uses a logical adder to reduce the number of logical formulaes so that it increases linearly with the number of containers.
 
 # Options
 
@@ -56,7 +60,7 @@ To skip samples, enter 0. You will be asked for a series of questions to customi
 
 # Behind the scene
 
-As opposed to my previous automated reasoning models, this one is dynamic: it is built on the fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
+Kinglet is dynamic: the Z3 model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
 
 Affinity and size constraints are intricated, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
 In the code, intrication is materialized by propositional logic statements of the form:
@@ -65,9 +69,10 @@ In the code, intrication is materialized by propositional logic statements of th
 Implies(And(affinity constraints), lower bound on Bitvector node capacity)
 ```
 
-An early version of kinglet needed an exponential number of such formulas.
-With the introduction of an adder made of 2 log(n) bit registers (where n is the number of containers), kinglet now generates a linear number of Implies()
+## Equalities for affinity constraints
 
-All what this means is that kinglet may now reason about much more nodes and containers!
+## Bitvectors for size constraints
+
+### Logical adder
 
 ![alt text](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
