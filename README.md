@@ -11,8 +11,8 @@ Kinglet simulates how the scheduler part of a Kubernetes orchestrator distribute
 Kinglet is a python3 script. For most of us, the only module one might have to install is the z3 module... Very simple!
 The scrip comes in two flavours:
 
-* The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
-* THe next verion, **kinglet_II.py** is currently in alpha. It uses a logical adder to reduce the number of logical formulaes so that it increases linearly with the number of containers.
+- The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
+- The next verion, **kinglet_II.py** is currently in alpha. It uses a logical adder to reduce the number of logical formulaes so that it increases linearly with the number of containers.
 
 # Options
 
@@ -75,18 +75,24 @@ For both versions of kinglet, nodes and containers are specified in the common f
 
 ### The node class
 
-Nodes have a hardcoded maximum capacity: *self.max_size*. By default, it is set to DEFAULTMAXSIZE.
-The current capacity is expressed as an **unbounded** BitVector *self.size* which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
-Nodes are also equipped with an **unbounded** AffinitySort: *self.affinities[0]*
-Only the first item in the self.affinities list is used. 
+- nodes have a hardcoded maximum capacity: *self.max_size*. By default, it is set to DEFAULTMAXSIZE.
+- the current capacity is expressed as an **unbounded** BitVector *self.size* which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
+- nodes are also equipped with an **unbounded** AffinitySort: *self.affinities[0]*
+- only the first item in the self.affinities list is used. 
 
 ### The container class
 
-Containers are equiped with an **unbounded** NodeSort *self.container* that is used to express to which node the node is scheduled.
-They are also fitted with a list of **bounded** AffinitySort variables: on for each possible affinity or anti-affinity: *self.affinities*
-Finally, they are fitted with a list of as many **unbounded** BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise.
+- containers are equiped with an **unbounded** NodeSort *self.container* that is used to express to which node the node is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
+- they are also fitted with a list of **bounded** AffinitySort variables: on for each possible affinity or anti-affinity: *self.affinities*
+- they are fitted with a list of as many **unbounded** BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise.
 
-## Equalitie for affinity constraints
+## Equality for affinity constraints
+
+Each time a container is created, all the affinities and ant-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
+
+When Z3 attempts to attach a container to a node, the affinity of this node is also added to the equivalence class of the container:
+- if this is not possible, Z3 tries to find another "compatible" node
+- if it can't then the scheduling is unsatisfiable
 
 ## Bitvector for size constraints
 
