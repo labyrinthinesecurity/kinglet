@@ -98,7 +98,21 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 ### Stable version
 
-In **kinglet_I.py**, each container has a list of n *self.location[]* BoolSort. So for each node it is easy to set a lowerbound on its capacity: we write as many Implies statements as there as possible combinations of 
+In **kinglet_I.py**, each container c has a list of n *container[c].location[n]* BoolSort. So for each node it is easy to set a lowerbound on its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations are set to n.
+
+For example, considering node 1 and 7 containers (ranging from 0 to 6):
+
+We start from the situation where no container locations are set to node 1, in which case the lower bound on the node capacity is zero:
+```
+Implies(And(Not(containers[0].locations[1]),Not(containers[1].locations[1]),Not(containers[2].locations[1]),Not(containers[3].locations[1]),Not(containers[4].locations[1]),Not(containers[5].locations[1]),Not(containers[6].locations[1])),UGE(nodes[1].size,0)))
+```
+
+We review all combinations until all container locations are set to node 1, in which case the lower bound on the node capacity is 7:
+
+```
+Implies(And(containers[0].locations[1],containers[1].locations[1],containers[2].locations[1],containers[3].locations[1],containers[4].locations[1],containers[5].locations[1],containers[6].locations[1]),UGE(nodes[1].size,7)))
+```
+
 
 ### Alpha version
 
