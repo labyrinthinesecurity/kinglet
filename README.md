@@ -69,9 +69,26 @@ In the code, intrication is materialized by propositional logic statements of th
 Implies(And(affinity constraints), lower bound on Bitvector node capacity)
 ```
 
-## Equalities for affinity constraints
+## Classes
 
-## Bitvectors for size constraints
+For both versions of kinglet, nodes and containers are specified in the common file **kingletcommon.py**
+
+### The node class
+
+Nodes have a hardcoded maximum capacity: *self.max_size*. By default, it is set to DEFAULTMAXSIZE.
+The current capacity is expressed as an **unbounded** BitVector *self.size* which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
+Nodes are also equipped with an **unbounded** AffinitySort: *self.affinities[0]*
+Only the first item in the self.affinities list is used. 
+
+### The container class
+
+Containers are equiped with an **unbounded** NodeSort *self.container* that is used to express to which node the node is scheduled.
+They are also fitted with a list of **bounded** AffinitySort variables: on for each possible affinity or anti-affinity: *self.affinities*
+Finally, they are fitted with a list of as many **unbounded** BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise.
+
+## Equalitie for affinity constraints
+
+## Bitvector for size constraints
 
 ### Logical adder
 
