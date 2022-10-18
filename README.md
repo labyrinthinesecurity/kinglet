@@ -2,7 +2,7 @@
 
 # Introduction
 
-Let tiny king Godefroy The First guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages propositional logic to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
+Let the tiny king guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages propositional logic to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
 
 Kinglet simulates how the scheduler part of a Kubernetes orchestrator distributes workloads over a cluster, in a provable way.
 
@@ -45,19 +45,14 @@ Any label in one pair can be freely combined with any label in another pair. For
 It is also possible to mix and match affinities and anti-affinities on a same container. For example, *up*, *close* and *old*.
 
 
-# Tutorials
+# Samples and customization
 
-When you run kinglet.py, enter numbers 1 to 4 to select one of the tutorials.
+## Samples
+When you run kinglet, enter numbers 1 to 4 to select one of the samples.
 
-## Tutorial 1
+## Customization
 
-In this first tutorial, the cluster is configured with 4 nodes and 5 containers.
-
-## Tutorial 2
-
-## Tutorial 3
-
-## Tutorial 4
+To skip samples, enter 0. You will be asked for a series of questions to customize a test run.
 
 # Behind the scene
 
