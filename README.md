@@ -12,7 +12,7 @@ Kinglet is a python3 script. For most of us, the only module one might have to i
 The scrip comes in two flavours:
 
 - The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
-- The next verion, **kinglet_II.py** is currently in alpha. It uses a logical adder to drastically reduce the number of logical formulaes (see below).
+- The next version, **kinglet_II.py** is currently in alpha. It uses a logical adder to drastically reduce the number of logical formulaes (see below).
 
 # Options
 
@@ -94,7 +94,7 @@ Or(self.container==nodes[0].node,...,self.container==nodes[NODENUM])
 They are also fitted with a list of AffinitySort variables: one for each possible affinity or anti-affinity: *self.affinities*
 
 ```
-And(self.affinity[a]==affinity[a],...,self.affinity[z]==affinity[z])
+And(self.affinity['old']==affinity['old'],...,self.affinity['small']==affinity['small'])
 ```
 
 They are fitted with a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
