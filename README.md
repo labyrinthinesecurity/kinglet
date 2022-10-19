@@ -138,8 +138,9 @@ We have produced 128 Implies() statements
 Keeping the previous example, imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only 3 registers R0, R1, and R2. 
 
 ```
-Implies(Not(R0),Not(R1), Not(R2), UGE(nodes[1].size,0)
-Implies(R0,R1,R2, UGE(nodes[1].size,7)
+Implies(Not(R0),Not(R1),Not(R2), UGE(nodes[1].size,0))
+...
+Implies(R0,R1,R2, UGE(nodes[1].size,7))
 ```
 
 Now instead of producing 128 statements, we only produce 8 of them. That's much better!
