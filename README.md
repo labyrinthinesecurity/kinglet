@@ -129,16 +129,23 @@ We review all combinations until all container locations are set to node 1, in w
 ```
 Implies(And(containers[0].locations[1],containers[1].locations[1],containers[2].locations[1],containers[3].locations[1],containers[4].locations[1],containers[5].locations[1],containers[6].locations[1]),UGE(nodes[1].size,7)))
 ```
-
+We have produced 128 Implies() statements
 
 ### Alpha version
 
-**kinglet_II.py** improves on the above design by placing a constraint on the bitwise sum of containers locations rather than enumerating all possible combinations.
+**kinglet_II.py** improves on the above design by placing a constraint on the bitwise sum of containers locations rather than enumerating all possible combinations. As a result, the number of *Implies()* statements falls from exponential to linear.
 
-As a result, the number of *Implies()* statements falls from exponential to linear.
+Keeping the previous example, imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only 3 registers R0, R1, and R2. 
 
-The sum is performed with a standard logical adder as described below.
+```
+Implies(Not(R0),Not(R1), Not(R2), UGE(nodes[1].size,0)
+Implies(R0,R1,R2, UGE(nodes[1].size,7)
+```
 
-#### Logical adder
+Now instead of producing 128 statements, we only produce 8 of them. That's much better!
+
+This bitwise sum over the registers is performed with a standard logical adder as described below.
+
+#### An 8-bits logical adder
 
 ![source www.101computing.net](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
