@@ -63,7 +63,7 @@ To skip samples, enter 0. You will be asked for a series of questions to customi
 
 # Behind the scene
 
-Kinglet is dynamic solver: the Z3 STM model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
+Kinglet is dynamic solver: the Z3 SMT model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
 
 Affinity and size constraints are intricated, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
 In the code, intrication is materialized by propositional logic statements of the form:
