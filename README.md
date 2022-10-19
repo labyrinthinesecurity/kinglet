@@ -79,25 +79,25 @@ For both versions of kinglet, nodes and containers are specified in the common f
 ### The node class
 
 - nodes have a hardcoded maximum capacity: *self.max_size*. By default, it is set to DEFAULTMAXSIZE.
-- the current capacity is expressed as a **free variable** of type BitVector, *self.size*, which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
-- nodes are also equipped with a **free variable** AffinitySort: *self.affinities[0]*
+- the current capacity is expressed as a variable of type BitVector, *self.size*, which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
+- nodes are also equipped with an AffinitySort variablr: *self.affinities[0]*
 - only the first item in the self.affinities list is used.
 
 ### The container class
 
-Containers are equiped with a **free variable** of type NodeSort, *self.container*, that is used to express to which node the node is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
+Containers are equiped with a variable of type NodeSort, *self.container*, that is used to express to which node the node is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
 
 ```
 Or(self.container==nodes[0].node,...,self.container==nodes[NODENUM])
 ```
 
-They are also fitted with a list of **bound** AffinitySort variables: one for each possible affinity or anti-affinity: *self.affinities*
+They are also fitted with a list of AffinitySort variables: one for each possible affinity or anti-affinity: *self.affinities*
 
 ```
 And(self.affinity[a]==affinity[a],...,self.affinity[z]==affinity[z])
 ```
 
-They are fitted with a list of as many BoolSort **free variables** *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
+They are fitted with a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
 
 ```
 And(self.container==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM])
