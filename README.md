@@ -12,7 +12,7 @@ Kinglet is a python3 script. For most of us, the only module one might have to i
 The scrip comes in two flavours:
 
 - The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
-- The next verion, **kinglet_II.py** is currently in alpha. It uses a logical adder to reduce the number of logical formulaes so that it increases linearly with the number of containers.
+- The next verion, **kinglet_II.py** is currently in alpha. It uses a logical adder to drastically reduce the number of logical formulaes (see below).
 
 # Options
 
@@ -22,17 +22,17 @@ By default, the INTERACTIVE variable is set to True, meaning that the Good King 
 
 ## Controling verbosity
 
-If you want to see how Kinglet constructs a SMT model on-the-fly and see the olutions found (if any!), set VERBOSE to True.
+If you want to see how Kinglet constructs a SMT model on-the-fly and see the solutions (if there are any!), set VERBOSE to True.
 
 ## Playing with the number of nodes and/or containers
 
-Set NODENUM to the number of nodes in the cluster, and CONTAINERNUM to the number of containers to schedule.
+Set NODENUM to the number of nodes in a cluster, and CONTAINERNUM to the number of containers to schedule.
 
 # Default constraints
 
 ## Affinities
 
-Only two independent affinities are set by default: *aged* and *old*.
+Only two independent affinities are set by default: *aged* and *old*. Feel free to add your own!
 
 Kinglet will do its best to run containers sharing the same affinity labels on the same nodes.
 
@@ -52,15 +52,18 @@ It is also possible to mix and match affinities and anti-affinities on a same co
 # Samples and customization
 
 ## Samples
-When you run kinglet, enter numbers 1 to 4 to select one of the samples.
+When you run kinglet I or kinglet II, enter numbers 1 to 4 to select one of the samples.
 
 ## Customization
 
-To skip samples, enter 0. You will be asked for a series of questions to customize a test run.
+To skip samples, enter 0. You will be asked for a series of questions to customize a test run:
+- how many nodes
+- what is the size of the nodes
+- how many containers
 
 # Behind the scene
 
-Kinglet is dynamic: the Z3 model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
+Kinglet is dynamic solver: the Z3 STM model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
 
 Affinity and size constraints are intricated, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
 In the code, intrication is materialized by propositional logic statements of the form:
