@@ -79,15 +79,15 @@ For both versions of kinglet, nodes and containers are specified in the common f
 ### The node class
 
 - nodes have a hardcoded maximum capacity: *self.max_size*. By default, it is set to DEFAULTMAXSIZE.
-- the current capacity is expressed as an **unbounded** BitVector *self.size* which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
-- nodes are also equipped with an **unbounded** AffinitySort: *self.affinities[0]*
+- the current capacity is expressed as a **free variable** of type BitVector, *self.size*, which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
+- nodes are also equipped with a **free variable** AffinitySort: *self.affinities[0]*
 - only the first item in the self.affinities list is used. 
 
 ### The container class
 
-- containers are equiped with an **unbounded** NodeSort *self.container* that is used to express to which node the node is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
-- they are also fitted with a list of **bounded** AffinitySort variables: on for each possible affinity or anti-affinity: *self.affinities*
-- they are fitted with a list of as many **unbounded** BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise.
+- containers are equiped with a **free variable** of type NodeSort, *self.container*, that is used to express to which node the node is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
+- they are also fitted with a list of **bound** AffinitySort variables: on for each possible affinity or anti-affinity: *self.affinities*
+- they are fitted with a list of as many BoolSort **free variables** *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise.
 
 ## Equality for affinity constraints
 
@@ -101,7 +101,7 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 ### Stable version
 
-In **kinglet_I.py**, each container c has a list of n *container[c].location[n]* BoolSort. So for each node it is easy to set a lowerbound on its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations are set to n.
+In **kinglet_I.py**, each container c has a list of n *container[c].location[n]* BoolSort variables. So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
 
 For example, considering node 1 and 7 containers (ranging from 0 to 6):
 
