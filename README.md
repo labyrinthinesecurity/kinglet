@@ -116,7 +116,11 @@ Implies(And(containers[0].locations[1],containers[1].locations[1],containers[2].
 
 ### Alpha version
 
-**kinglet_II.py** improves on the above design by adding container locations together and placing a constraint on the bitwise sum rather than on every single combination of containers. 
+**kinglet_II.py** improves on the above design by placing a constraint on the bitwise sum of containers locations rather than enumerating all possible combinations.
+
+As a result, the number of *Implies()* statements falls from exponential to linear.
+
+The sum is performed with a standard logical adder as described below.
 
 #### Logical adder
 
