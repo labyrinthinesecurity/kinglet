@@ -9,7 +9,7 @@ Kinglet simulates how the scheduler part of a Kubernetes orchestrator distribute
 # Installation
 
 Kinglet is a python3 script. For most of us, the only module one might have to install is the z3 module... Very simple!
-The scrip comes in two flavours:
+The script comes in two flavours:
 
 - The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
 - The next version, **kinglet_II.py** is currently in alpha. It uses a logical adder to drastically reduce the number of logical formulaes (see below).
@@ -18,7 +18,7 @@ The scrip comes in two flavours:
 
 ## Disabling interactions
 
-By default, the INTERACTIVE variable is set to True, meaning that the Good King will display a splash screen and ask you some questions. Since the first question is whether you want to run one of the tutorial described below, I strongly advise you to let it as it is.
+By default, the INTERACTIVE variable is set to True: the Good King will display a splash screen and ask you some questions. Since the first question is whether you want to run one of the tutorial described below, I strongly advise you to let it as it is.
 
 ## Controling verbosity
 
@@ -32,7 +32,7 @@ Set NODENUM to the number of nodes in a cluster, and CONTAINERNUM to the number 
 
 ## Affinities
 
-Only two independent affinities are set by default: *aged* and *old*. Feel free to add your own!
+Only affinity is set by default: *old*. Feel free to add your own!
 
 Kinglet will do its best to run containers sharing the same affinity labels on the same nodes.
 
@@ -63,9 +63,9 @@ To skip samples, enter 0. You will be asked for a series of questions to customi
 
 # Behind the scene
 
-Kinglet is dynamic solver: the Z3 SMT model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
+Kinglet is a dynamic solver: the Z3 SMT model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
 
-Affinity and size constraints are intricated, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
+Affinity and size constraints depend on one another, since placing a container on a node given an affinity constraint depends on the node "free space" capacity. 
 In the code, intrication is materialized by propositional logic statements of the form:
 
 ```
@@ -135,7 +135,7 @@ We have produced 128 Implies() statements
 
 **kinglet_II.py** improves on the above design by placing a constraint on the bitwise sum of containers locations rather than enumerating all possible combinations. As a result, the number of *Implies()* statements falls from exponential to linear.
 
-Keeping the previous example, imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only 3 registers R0, R1, and R2. 
+Keeping the previous example, imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2. 
 
 ```
 Implies(Not(R0),Not(R1),Not(R2), UGE(nodes[1].size,0))
