@@ -150,3 +150,9 @@ This bitwise sum over the registers is performed with a standard logical adder a
 #### An 8-bits logical adder
 
 ![source www.101computing.net](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
+
+# License information
+The cover picture is copyright Adobe Photo Stock. It is used with permission.
+
+The rest of this repository is licensed under 
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
