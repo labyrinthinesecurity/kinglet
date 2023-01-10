@@ -85,10 +85,10 @@ For both versions of kinglet, nodes and containers are specified in the common f
 
 ### The container class
 
-Containers are equiped with a variable of type NodeSort, *self.container*, that is used to express to which node the node is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
+Containers are equiped with a variable of type NodeSort, *self.node*, that is used to express to which node the container is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
 
 ```
-Or(self.container==nodes[0].node,...,self.container==nodes[NODENUM])
+Or(self.node==nodes[0].node,...,self.node==nodes[NODENUM])
 ```
 
 They are also fitted with a list of AffinitySort variables: one for each possible affinity or anti-affinity: *self.affinities*
@@ -100,7 +100,7 @@ And(self.affinity['old']==affinity['old'],...,self.affinity['small']==affinity['
 They are fitted with a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
 
 ```
-And(self.container==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM])
+And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM])
 ```
 
 ## Equality for affinity constraints
