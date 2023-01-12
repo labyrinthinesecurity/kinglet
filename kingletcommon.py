@@ -1,5 +1,4 @@
 #!/usr/bin/python3 -u
-#from common import *
 from z3 import *
 import random,math,sys
 import hashlib
@@ -14,8 +13,8 @@ INTERACTIVE=False
 rand=False
 sample=0
 
-NODENUM=2
-CONTAINERNUM=7
+NODENUM=3
+CONTAINERNUM=3
 
 sol=Solver()
 registers=[]
@@ -71,7 +70,7 @@ class node:
     sol.add(UGE(self.size,0))
 
 class container:
-  container=None
+  node=None
   affinities=None
   locations=None
   name=None
@@ -86,7 +85,7 @@ class container:
     for i in range(0,len(nodes)):
       self.locations.append(Const(str(name)+'_'+str(i),BoolSort()))
       addBit(str(name)+'_'+str(i))
-    self.container=Const('container_'+str(name),NodeSort)
+    self.node=Const('node_'+str(name),NodeSort)
     for aA in affs:
       nza=Const('affinity_c'+str(name)+'_'+aA,AffinitySort)
       self.affinities.append(nza)
@@ -98,7 +97,7 @@ class container:
       if i>0:
         expr=expr+','
 #      expr=expr+'Implies(self.container==nodes['+str(i)+'].node,And(self.locations['+str(i)+'],'
-      expr=expr+'And(self.container==nodes['+str(i)+'].node,self.locations['+str(i)+'],'
+      expr=expr+'And(self.node==nodes['+str(i)+'].node,self.locations['+str(i)+'],'
       for a in range(0,len(self.affinities)):
         expr=expr+'Or('
         for b in range(0,len(nodes[i].affinities)):
@@ -122,7 +121,7 @@ class container:
     eval(expr)
     expr='sol.add(Or('
     for i in range(0,len(nodes)):
-      expr=expr+'self.container==nodes['+str(i)+'].node,'
+      expr=expr+'self.node==nodes['+str(i)+'].node,'
     expr=expr[:-1]
     expr=expr+'))'
     eval(expr)
@@ -178,100 +177,6 @@ def searchBit(name):
       return n
     n=n+1
   return None
-
-def half_adder1(a,b,sm,carry):
-  global sol
-  global registers
-  foundA=False
-  foundB=False
-  foundSum=False
-  foundCarry=False
-  av=None
-  bv=None
-  sv=None
-  cv=None
-  zcarry=None
-  zsum=None
-  if (a is None) or (b is None):
-    if a is None:
-      a='False'
-    if b is None:
-      b='False'
-    if carry is None:
-      carry='c:'+str(uuid.uuid4())
-  if carry is None:
-    carry='c:'+a+'_'+b
-  if sm is None:
-    sm='s:'+a+'+'+b
-  for c in registers:
-    if c['name']==a:
-      foundA=True
-      av=c['value']
-    elif c['name']==b:
-      foundB=True
-      bv=c['value']
-    elif c['name']==sm:
-      foundSum=True
-      sv=c['value']
-      zsum=c
-    elif c['name']==carry:
-      foundCarry=True
-      cv=c['value']
-      zcarry=c
-  if foundA==False:
-    av=addBit(a)
-  if foundB==False:
-    bv=addBit(b)
-  if foundSum==False:
-    sv=addBit(sm)
-    for c in registers:
-      if c['name']==sm:
-        zsum=c
-        break
-  if foundCarry==False:
-    cv=addBit(carry)
-    for c in registers:
-      if c['name']==carry:
-        zcarry=c
-        break
-  sol.add(sv==Xor(av,bv),cv==And(av,bv))
-  if VERBOSE==True:
-    print('sol.add(sv==Xor('+a+','+b+'),'+carry+'==And(+'+a+','+b+'))')
-#  print("(i) HALF "+a+" + "+b+" init with carry",zcarry['name'],"sum",zsum['name'])
-  return zcarry,zsum
-
-def adderNregisters(az,bz,nregisters):
-  global sol
-  zsm=[]
-  zsm2=[]
-  tsm=[]
-  tsm2=[]
-  for n in range(0,nregisters):
-    zsm.append([])
-    zsm2.append([])
-    zsm[n]='s:'+az[n]+'+'+bz[n]+'b'+str(n)
-    tsm.append([])
-    tsm2.append([])
-#  print("half0 IN",az[0],bz[0],zsm[0],None)
-  carry,tsm[0]=half_adder1(az[0],bz[0],zsm[0],None)   
-  tsm2[0]=tsm[0]
-#  print("     OUT",carry,tsm2[0])
-  for i in range(1,len(az)):
-    prevcarry=carry
-#    print("half1 IN",i,az[i],bz[i],zsm[i],None)
-    carry,tsm[i]=half_adder1(az[i],bz[i],zsm[i],None)
-    print("     OUT",carry,tsm[i])
-    if i==1:
-#      print("half2-first IN",prevcarry['name'],zsm[i],"None","None")
-      carry2,tsm2[i]=half_adder1(prevcarry['name'],tsm[i]['name'],None,None)
-#      print("           OUT",carry2,tsm2[i])
-      for n in range(0,nregisters):
-        zsm2[n]=tsm2[i]['name']+'b'+str(n)
-    else:
-#      print("half2-secnd IN",prevcarry['name'],zsm[i],zsm2[i],carry2['name'])
-      carry,tsm2[i]=half_adder1(prevcarry['name'],zsm[i],zsm2[i],carry2['name'])
-#      print("           OUT",carry2,tsm2[i])
-  return tsm2
 
 if INTERACTIVE:
   splashScreen()
@@ -384,4 +289,3 @@ elif sample==4:
 
 logc=1+int(math.floor(math.log(len(containers),2)))
 print("N=",len(nodes)," C=",len(containers),"("+str(logc)+")")
-
