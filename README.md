@@ -9,10 +9,6 @@ Kinglet simulates how the scheduler part of a Kubernetes orchestrator distribute
 # Installation
 
 Kinglet is a python3 script. For most of us, the only module one might have to install is the z3 module... Very simple!
-The script comes in two flavours:
-
-- The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
-- The next version, **kinglet_II.py** is currently in alpha. It uses a logical adder to drastically reduce the number of logical formulaes (see below).
 
 # Options
 
@@ -52,7 +48,7 @@ It is also possible to mix and match affinities and anti-affinities on a same co
 # Samples and customization
 
 ## Samples
-When you run kinglet I or kinglet II, enter numbers 1 to 4 to select one of the samples.
+When you run kinglet in INTERACTVE mode, enter numbers 1 to 4 to select one of the samples.
 
 ## Customization
 
@@ -74,7 +70,7 @@ Implies(And(affinity constraints), lower bound on Bitvector node capacity)
 
 ## Classes
 
-For both versions of kinglet, nodes and containers are specified in the common file **kingletcommon.py**
+Nodes and containers are specified in the common file **kingletcommon.py**
 
 ### The node class
 
@@ -97,7 +93,7 @@ They are also fitted with a list of AffinitySort variables: one for each possibl
 And(self.affinity['old']==affinity['old'],...,self.affinity['small']==affinity['small'])
 ```
 
-They are fitted with a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
+Finally, they contain a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
 
 ```
 And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM])
@@ -105,7 +101,7 @@ And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.
 
 ## Equality for affinity constraints
 
-Each time a container is created, all the affinities and ant-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
+Each time a container is created, all the affinities and anti-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
 
 When Z3 attempts to attach a container to a node, the affinity of this node is also added to the equivalence class of the container:
 - if this is not possible, Z3 tries to find another "compatible" node
@@ -113,29 +109,13 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 ## Bitvector for size constraints
 
-### Stable version
+Each container c has a list of n *container[c].location[n]* BoolSort variables. All these Booleans are False except the one corresponding to the node chosen by Z3. 
 
-In **kinglet_I.py**, each container c has a list of n *container[c].location[n]* BoolSort variables. So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
+For example, if container 54 is hosted on node 4, then container[53].location[4] will be True. All other locations under container[53] will be False.
 
-For example, considering node 1 and 7 containers (ranging from 0 to 6):
+So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
 
-We start from the situation where no container locations are set to node 1, in which case the lower bound on the node capacity is zero:
-```
-Implies(And(Not(containers[0].locations[1]),Not(containers[1].locations[1]),Not(containers[2].locations[1]),Not(containers[3].locations[1]),Not(containers[4].locations[1]),Not(containers[5].locations[1]),Not(containers[6].locations[1])),UGE(nodes[1].size,0)))
-```
-
-We review all combinations until all container locations are set to node 1, in which case the lower bound on the node capacity is 7:
-
-```
-Implies(And(containers[0].locations[1],containers[1].locations[1],containers[2].locations[1],containers[3].locations[1],containers[4].locations[1],containers[5].locations[1],containers[6].locations[1]),UGE(nodes[1].size,7)))
-```
-We have produced 128 Implies() statements
-
-### Alpha version
-
-**kinglet_II.py** improves on the above design by placing a constraint on the bitwise sum of containers locations rather than enumerating all possible combinations. As a result, the number of *Implies()* statements falls from exponential to linear.
-
-Keeping the previous example, imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2. 
+Imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2.
 
 ```
 Implies(Not(R0),Not(R1),Not(R2), UGE(nodes[1].size,0))
@@ -143,13 +123,13 @@ Implies(Not(R0),Not(R1),Not(R2), UGE(nodes[1].size,0))
 Implies(R0,R1,R2, UGE(nodes[1].size,7))
 ```
 
-Now instead of producing 128 statements, we only produce 8 of them. That's much better!
+To define registers R0 to R2, we make bitwise addition of all container locations node 1:
 
-This bitwise sum over the registers is performed with a standard logical adder as described below.
+```
+(R0,R1,R2)= containers[0].location[1]+containers[1].location[1]+...containers[6].location[1]
+```
 
-#### An 8-bits logical adder
-
-![source www.101computing.net](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
+The bitwise addition is performed by the adder() function.
 
 # License information
 The cover picture is copyright Adobe Photo Stock. It is used with permission.
