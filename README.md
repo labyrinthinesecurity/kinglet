@@ -9,10 +9,6 @@ Kinglet simulates how the scheduler part of a Kubernetes orchestrator distribute
 # Installation
 
 Kinglet is a python3 script. For most of us, the only module one might have to install is the z3 module... Very simple!
-The script comes in two flavours:
-
-- The stable version, **kinglet_I.py** is unoptimized in terms of performance. The number of logical formulaes increases exponantially with the number of containers.
-- The next version, **kinglet_II.py** is currently in alpha. It uses a logical adder to drastically reduce the number of logical formulaes (see below).
 
 # Options
 
@@ -52,7 +48,7 @@ It is also possible to mix and match affinities and anti-affinities on a same co
 # Samples and customization
 
 ## Samples
-When you run kinglet I or kinglet II, enter numbers 1 to 4 to select one of the samples.
+When you run kinglet in INTERACTVE mode, enter numbers 1 to 4 to select one of the samples.
 
 ## Customization
 
@@ -74,7 +70,7 @@ Implies(And(affinity constraints), lower bound on Bitvector node capacity)
 
 ## Classes
 
-For both versions of kinglet, nodes and containers are specified in the common file **kingletcommon.py**
+Nodes and containers are specified in the common file **kingletcommon.py**
 
 ### The node class
 
@@ -97,7 +93,7 @@ They are also fitted with a list of AffinitySort variables: one for each possibl
 And(self.affinity['old']==affinity['old'],...,self.affinity['small']==affinity['small'])
 ```
 
-They are fitted with a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
+Finally, they contain a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
 
 ```
 And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM])
@@ -105,7 +101,7 @@ And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.
 
 ## Equality for affinity constraints
 
-Each time a container is created, all the affinities and ant-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
+Each time a container is created, all the affinities and anti-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
 
 When Z3 attempts to attach a container to a node, the affinity of this node is also added to the equivalence class of the container:
 - if this is not possible, Z3 tries to find another "compatible" node
@@ -113,9 +109,7 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 ## Bitvector for size constraints
 
-### Stable version
-
-In **kinglet_I.py**, each container c has a list of n *container[c].location[n]* BoolSort variables. So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
+Each container c has a list of n *container[c].location[n]* BoolSort variables. So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
 
 For example, considering node 1 and 7 containers (ranging from 0 to 6):
 
