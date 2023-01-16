@@ -115,13 +115,21 @@ For example, if container 54 is hosted on node 4, then container[53].location[4]
 
 So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
 
-Imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2. 
+Imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2.
 
 ```
 Implies(Not(R0),Not(R1),Not(R2), UGE(nodes[1].size,0))
 ...
 Implies(R0,R1,R2, UGE(nodes[1].size,7))
 ```
+
+To define registers R0 to R2, we make bitwise addition of all container locations node 1:
+
+```
+(R0,R1,R2)= containers[0].location[1]+containers[1].location[1]+...containers[6].location[1]
+```
+
+The bitwise addition is performed by the adder() function.
 
 # License information
 The cover picture is copyright Adobe Photo Stock. It is used with permission.
