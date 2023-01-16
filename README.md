@@ -109,41 +109,19 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 ## Bitvector for size constraints
 
-Each container c has a list of n *container[c].location[n]* BoolSort variables. So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
+Each container c has a list of n *container[c].location[n]* BoolSort variables. All these Booleans are False except the one corresponding to the node chosen by Z3. 
 
-For example, considering node 1 and 7 containers (ranging from 0 to 6):
+For example, if container 54 is hosted on node 4, then container[53].location[4] will be True. All other locations under container[53] will be False.
 
-We start from the situation where no container locations are set to node 1, in which case the lower bound on the node capacity is zero:
-```
-Implies(And(Not(containers[0].locations[1]),Not(containers[1].locations[1]),Not(containers[2].locations[1]),Not(containers[3].locations[1]),Not(containers[4].locations[1]),Not(containers[5].locations[1]),Not(containers[6].locations[1])),UGE(nodes[1].size,0)))
-```
+So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
 
-We review all combinations until all container locations are set to node 1, in which case the lower bound on the node capacity is 7:
-
-```
-Implies(And(containers[0].locations[1],containers[1].locations[1],containers[2].locations[1],containers[3].locations[1],containers[4].locations[1],containers[5].locations[1],containers[6].locations[1]),UGE(nodes[1].size,7)))
-```
-We have produced 128 Implies() statements
-
-### Alpha version
-
-**kinglet_II.py** improves on the above design by placing a constraint on the bitwise sum of containers locations rather than enumerating all possible combinations. As a result, the number of *Implies()* statements falls from exponential to linear.
-
-Keeping the previous example, imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2. 
+Imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2. 
 
 ```
 Implies(Not(R0),Not(R1),Not(R2), UGE(nodes[1].size,0))
 ...
 Implies(R0,R1,R2, UGE(nodes[1].size,7))
 ```
-
-Now instead of producing 128 statements, we only produce 8 of them. That's much better!
-
-This bitwise sum over the registers is performed with a standard logical adder as described below.
-
-#### An 8-bits logical adder
-
-![source www.101computing.net](https://www.101computing.net/wp/wp-content/uploads/Binary-addition-using-binary-adder-circuits.png)
 
 # License information
 The cover picture is copyright Adobe Photo Stock. It is used with permission.
