@@ -28,7 +28,7 @@ Set NODENUM to the number of nodes in a cluster, and CONTAINERNUM to the number 
 
 ## Affinities
 
-Only affinity is set by default: *old*. Feel free to add your own!
+Onlyo'e  affinity is set by default: *old*. Feel free to add your own!
 
 Kinglet will do its best to run containers sharing the same affinity labels on the same nodes.
 
@@ -57,7 +57,7 @@ To skip samples, enter 0. You will be asked for a series of questions to customi
 - what is the size of the nodes
 - how many containers
 
-# Behind the scene
+# Behind the scenes
 
 Kinglet is a dynamic solver: the Z3 SMT model is built on-the-fly depending to the number of containers and nodes on the cluster. Thank you Python's eval() function!
 
@@ -84,7 +84,7 @@ Nodes and containers are specified in the common file **kingletcommon.py**
 Containers are equiped with a variable of type NodeSort, *self.node*, that is used to express to which node the container is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
 
 ```
-Or(self.node==nodes[0].node,...,self.node==nodes[NODENUM])
+Or(self.node==nodes[0].node,...,self.node==nodes[NODENUM-1])
 ```
 
 They are also fitted with a list of AffinitySort variables: one for each possible affinity or anti-affinity: *self.affinities*
@@ -96,10 +96,10 @@ And(self.affinity['old']==affinity['old'],...,self.affinity['small']==affinity['
 Finally, they contain a list of as many BoolSort variables *self.location* as there are nodes. *self.location[i]* is set to **True** if *self.container* is set to node number i, and to **False** otherwise:
 
 ```
-And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM])
+And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM-1])
 ```
 
-## Equality for affinity constraints
+## Equational reasoning for affinity constraints
 
 Each time a container is created, all the affinities and anti-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
 
@@ -111,7 +111,7 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 
 Each container c has a list of n *container[c].location[n]* BoolSort variables. All these Booleans are False except the one corresponding to the node chosen by Z3. 
 
-For example, if container 54 is hosted on node 4, then container[53].location[4] will be True. All other locations under container[53] will be False.
+For example, if container 54 is hosted on node 4, then container[53].location[3] will be True. All other locations under container[53] will be False.
 
 So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
 
