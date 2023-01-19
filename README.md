@@ -2,7 +2,7 @@
 
 # Introduction
 
-Let the tiny king guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages Bitvectors theory and Equality theory to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
+Let the tiny king guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages Bitvectors theory, Propositional logic theory and Equality theory to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
 
 Kinglet simulates how the scheduler part of a Kubernetes orchestrator distributes workloads over a cluster, in a provable way.
 
@@ -114,6 +114,8 @@ Each container c has a list of n *container[c].location[n]* BoolSort variables. 
 For example, if container 54 is hosted on node 4, then container[53].location[3] will be True. All other locations under container[53] will be False.
 
 So for each node it is easy to set a lower bound to its capacity: for a given node n, we write as many Implies statements as there as possible combinations of container locations set to n.
+
+## Propositional logic theory for unifying size and affinity
 
 Imagine that we have 7 containers to place on just one node. Addressing 7 containers takes only a 3-bits register R0, R1, and R2.
 
