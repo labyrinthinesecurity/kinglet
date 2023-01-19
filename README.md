@@ -2,7 +2,7 @@
 
 # Introduction
 
-Let the tiny king guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages propositional logic to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
+Let the tiny king guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages Bitvectors theory and Equality theory to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
 
 Kinglet simulates how the scheduler part of a Kubernetes orchestrator distributes workloads over a cluster, in a provable way.
 
@@ -99,7 +99,7 @@ Finally, they contain a list of as many BoolSort variables *self.location* as th
 And(self.node==nodes[n].node,self.location[n],Not(self.location[0],...,Not(self.location[NODENUM-1])
 ```
 
-## Equational reasoning for affinity constraints
+## Equality theory for affinity constraints
 
 Each time a container is created, all the affinities and anti-affinities attached to this container are equated. So all affinities and anti-affinities of this container belong to the same **equivalence class**.
 
@@ -107,7 +107,7 @@ When Z3 attempts to attach a container to a node, the affinity of this node is a
 - if this is not possible, Z3 tries to find another "compatible" node
 - if it can't then the scheduling is unsatisfiable
 
-## Bitvector for size constraints
+## Bitvectors theory for size constraints
 
 Each container c has a list of n *container[c].location[n]* BoolSort variables. All these Booleans are False except the one corresponding to the node chosen by Z3. 
 
