@@ -12,50 +12,36 @@ Kinglet is a python3 script. For most of us, the only module one might have to i
 
 # Options
 
-## Disabling interactions
+Run kinglet.py --help 
 
-By default, the INTERACTIVE variable is set to True: the Good King will display a splash screen and ask you some questions. Since the first question is whether you want to run one of the tutorial described below, I strongly advise you to let it as it is.
+Possible options are:
+- ***nodes N*** number N of worker nodes in the cluster
+- ***pods P*** number P of pods/containers to launch on the cluster
+- ***capability C*** the max number C of pods/containers a node may run
+- ***seed S*** a seed for the Pseudo Ranom Numbers Generator. Useful if you want to give consistent placements between several runs
 
 ## Controling verbosity
 
 If you want to see how Kinglet constructs a SMT model on-the-fly and see the solutions (if there are any!), set VERBOSE to True.
 
-## Playing with the number of nodes and/or containers
+# Constraints
 
-Set NODENUM to the number of nodes in a cluster, and CONTAINERNUM to the number of containers to schedule.
+Each time kinglet is run, it will attach random constraints to containers. The constraints can be of three types:
+- affinity
+- anti-affinity
+- no constraint at all for this container
 
-# Default constraints
+Please note that, as of today, the random generator is rather silly and may attach contradictory constraints to a container.
 
 ## Affinities
 
-Onlyo'e  affinity is set by default: *old*. Feel free to add your own!
-
-Kinglet will do its best to run containers sharing the same affinity labels on the same nodes.
+Affinities are declared in the ***affinities*** dictionary. Feel free to add/remove your own!
 
 ## Anti-affinities
 
-4 pairs of anti-affinities are set by default:
-- *up* versus *down*
-- *black* versus *white*
-- *big* versus *small*
-- *close* versus *far*
+Affinities are declared in the ***affinities*** dictionary. Feel free to add/remove your own!
 
-Any label in one pair can be freely combined with any label in another pair. For example, a container may be attached labels *black* and *down*.
-
-It is also possible to mix and match affinities and anti-affinities on a same container. For example, *up*, *close* and *old*.
-
-
-# Samples and customization
-
-## Samples
-When you run kinglet in INTERACTVE mode, enter numbers 1 to 4 to select one of the samples.
-
-## Customization
-
-To skip samples, enter 0. You will be asked for a series of questions to customize a test run:
-- how many nodes
-- what is the size of the nodes
-- how many containers
+It is also possible to mix and match affinities and anti-affinities 
 
 # Behind the scenes
 
