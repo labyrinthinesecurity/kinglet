@@ -1,20 +1,25 @@
 #!/usr/bin/python3 -u
 from z3 import *
 import random,math,sys
-import hashlib
-from uuid import *
-from re import *
+import argparse
 
-VERBOSE=False
-DEFAULTSIZE=9
-RELAXEDSIZE=False
+parser = argparse.ArgumentParser()
+parser.add_argument("--nodes", type=int, nargs='?', default=2, help="number of worker nodes in cluser (default: 2 nodes)")
+parser.add_argument("--pods", type=int, nargs='?', default=2, help="number of pods in cluser (default: 2 pods)")
+parser.add_argument("--capability", nargs='?', default=2, type=int, help="how many pods per node ,at most (default: max 2 pods per node)")
+parser.add_argument("--seed", type=int, nargs='?', const=1, help="seed for the RNG (default: no seed)")
+args = parser.parse_args()
+
+
+VERBOSE=True
+SAVE=True
 INTERACTIVE=False
 
 rand=False
-sample=0
 
-NODENUM=10
-CONTAINERNUM=50
+NODENUM=args.nodes
+CONTAINERNUM=args.pods
+DEFAULTSIZE=args.capability
 
 sol=Solver()
 registers=[]
@@ -27,7 +32,7 @@ registers.append(aC)
 NodeSort=DeclareSort('Node')
 AffinitySort=DeclareSort('Affinity')
 
-up,down,white,black,small,big,far,close,old,aged=Consts('up down white black small big far close old aged',AffinitySort)
+up,down,white,black,small,big,far,close,old,aged,jupiter,venus,mars,mercury,soft,good,cat,dog,bird,snake,camel=Consts('up down white black small big far close old aged jupiter venus mars mercury soft good cat dog bird snake camel',AffinitySort)
 affinities={}
 affinities['up']=up
 affinities['down']=down
@@ -37,14 +42,26 @@ affinities['small']=small
 affinities['big']=big
 affinities['far']=far
 affinities['close']=close
+
+affinities['jupiter']=jupiter
+affinities['venus']=venus
+affinities['mars']=mars
+affinities['mercury']=mercury
+
 affinities['old']=old
 affinities['aged']=aged
+affinities['soft']=soft
+affinities['good']=good
+
+affinities['cat']=cat
+affinities['dog']=dog
+affinities['bird']=bird
+affinities['snake']=snake
+affinities['camel']=camel
 
 sol.add(up!=down)   # anti affinity
 sol.add(white!=black) # anti affinity
 sol.add(big!=small) # anti affinity
-sol.add(far!=close) # anti affinity
-
 nodes=[]
 containers=[]
 digits = "0123456789ABCDEF"
@@ -110,7 +127,7 @@ class container:
               expr=expr[:-1]
         expr=expr+'),'
       for j in range(0,len(nodes)):
-        if i!=j:
+         if i!=j:
           expr=expr+'Not(self.locations['+str(j)+'])'
           if j<len(nodes):
             expr=expr+','
@@ -173,8 +190,7 @@ v1.0 (Godefroy the First)
 def int2str(x, base, logw):
     rez=str(x) if x < base else int2str(x//base, base, logw) + digits[x % base]
     return rez
-
-def int2strwrapper(x,base,logw):
+  def int2strwrapper(x,base,logw):
   rez=int2str(x,base,logw)
   prefix=''
   if len(rez)<logw:
@@ -201,115 +217,31 @@ def searchBit(name):
   return None
 
 if INTERACTIVE:
-  splashScreen()
+ splashScreen()
 
-  while True:
-      try:
-          sample = int(input("Which sample number? Enter 0 to skip[4|3|2|1|0]"))
-      except ValueError:
-          print("Sorry, I didn't understand that.")
-          continue
-      else:
-          if sample<=4 and sample>=0:
-            break
-          else:
-            print("Sorry, I didn't understand that.")
-            continue
-  while True and sample==0:
-      try:
-          NODENUM = int(input("How many nodes[1-5]?"))
-      except ValueError:
-          print("Sorry, I didn't understand that.")
-          continue
-      else:
-          if NODENUM<=5 and NODENUM>0:
-            break
-          else:
-            print("Sorry, I didn't understand that.")
-            continue
-  while True and sample==0:
-      try:
-          CONTAINERNUM = int(input("How many containers[1-10]?"))
-      except ValueError:
-          print("Sorry, I didn't understand that.")
-          continue
-      else:
-          if CONTAINERNUM<=10 and CONTAINERNUM>0:
-            break
-          else:
-            print("Sorry, I didn't understand that.")
-            continue
-
-  while True and sample==0:
-    try:
-      qrand = int(input("Randomized node sizes?[1|0]?"))
-    except ValueError:
-      print("Sorry, I didn't understand that.")
-      continue
-    else:
-      if qrand>=0 and qrand<=1:
-        rand=False
-        if qrand==1:
-          rand=True
-        break
-      else:
-        print("Sorry, I didn't understand that.")
-        continue
-
-if sample>0:
-  VERBOSE=False
-  rand=False
-
-if sample==0:
-  for i in range(0,NODENUM):
-    if rand:
-      size=random.randint(3,6)
-    else:
-      size=DEFAULTSIZE
-    nodes.append(node(str(i),size))
-#    sol.add('nodes['+str(i)+'].size=='+str(DEFAULTSIZE))
-  for i in range(0,CONTAINERNUM):
-    containers.append(container('C'+str(i),['close','old']))
-elif sample==1:
-# 4 nodes,up!down,white!=black,big!small,far!close,aged,old AC:1 B:2 D:3  E:0
-  NODENUM=4
-  for i in range(0,NODENUM):
-    nodes.append(node(str(i),DEFAULTSIZE))
-  containers.append(container('A',['black','up','close']))
-  containers.append(container('B',['down','small']))
-  containers.append(container('C',['up','big']))
-  containers.append(container('D',['white','small']))
-  containers.append(container('E',['close']))
-elif sample==2:
-# 2 nodes,up!down,white!=black,big!small,far!close,aged,old ACE:1 BD:0
-  NODENUM=2
-  for i in range(0,NODENUM):
-    nodes.append(node(str(i),DEFAULTSIZE))
-  containers.append(container('A',['black','up','close']))
-  containers.append(container('B',['down','small']))
-  containers.append(container('C',['up','big']))
-  containers.append(container('D',['white','small']))
-  containers.append(container('E',['close']))
-elif sample==3:
-# 3 nodes,up!down,white!=black,big!small,far!close,aged,old AC:1  BD:2 E: 0
-  NODENUM=3
-  for i in range(0,NODENUM):
-    nodes.append(node(str(i),DEFAULTSIZE))
-  containers.append(container('A',['black','up','close']))
-  containers.append(container('B',['down','small']))
-  containers.append(container('C',['up','big']))
-  containers.append(container('D',['white','small']))
-  containers.append(container('E',['close']))
-elif sample==4:
-# 3 nodes,up!down,white!=black,big!small,far!close,aged,old ACE:2  BD:1
-  NODENUM=3
-  for i in range(0,NODENUM):
-    nodes.append(node(str(i),DEFAULTSIZE))
-  containers.append(container('A',['black','up','close','old']))
-  containers.append(container('B',['down','small']))
-  containers.append(container('C',['up','big']))
-  containers.append(container('D',['white','small']))
-  containers.append(container('E',['close','old']))
+if args.seed:
+  random.seed(args.seed)
+for i in range(0,NODENUM):
+   if rand:
+     size=random.randint(3,6)
+   else:
+     size=DEFAULTSIZE
+   nodes.append(node(str(i),size))
+for i in range(0,CONTAINERNUM):
+   zaffs=[]
+   j=random.randint(1,4)*random.randint(1,4)
+   if j>11:
+     j=1
+   elif j>2:
+     j=0
+   for k in range(0,j):
+     l=random.choice(list(affinities.values()))
+     zaffs.append(str(l))
+   print(zaffs)
+   zC=container('C'+str(i),zaffs)
+   containers.append(zC)
+   for aC in containers[:-1]:
+     sol.add(aC.node!=zC.node)
 
 logc=1+int(math.floor(math.log(len(containers),2)))
 
@@ -321,15 +253,15 @@ C = [ [ [Const("C_%s_%s_%s" % (k, j, i), BoolSort()) for i in range(logc)] for j
 
 ZERO = [Const("ZERO_%s" % i, BoolSort()) for i in range(logc)]
 ONE = [Const("ONE_%s" % i, BoolSort()) for i in range(logc)]
-
-for i in range(logc):
+ for i in range(logc):
   sol.add(ZERO[i]==False)
   if i>0:
     sol.add(ONE[i]==False)
   else:
     sol.add(ONE[i]==True)
 
-print("N=",len(nodes)," C=",len(containers)," logc="+str(logc))
+print("")
+print("N=",len(nodes)," C=",len(containers)," logc="+str(logc),"SIZE=",DEFAULTSIZE,"seed=",str(args.seed))
 if VERBOSE==True:
   for aN in nodes:
     print(aN.name,aN.max_size,end=' ')
@@ -338,6 +270,5 @@ if VERBOSE==True:
     print('')
   for aC in containers:
     print(aC.name,aC.affinities)
-  
-
+print("")
     
