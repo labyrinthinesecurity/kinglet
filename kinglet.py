@@ -32,6 +32,7 @@ for nd in range(len(nodes)):
 print("checking satisfiability...")
 print('')
 if sol.check()==sat:
+  nodesol={}
   mdl = sol.model()
   if VERBOSE==True:
     for nd in range(len(nodes)):
@@ -51,4 +52,12 @@ if sol.check()==sat:
       print('')
     print('')
   for nc in range(m):
-    print("CONTAINER",nc," attached to ",mdl.evaluate(containers[nc].node))
+    zv=mdl.evaluate(containers[nc].node)
+    if zv not in nodesol:
+      nodesol[zv]=0
+    nodesol[zv]=nodesol[zv]+1
+  if SAVE==True:
+    for nd in range(len(nodes)):
+      print("NODE",mdl.evaluate(nodes[nd].node),mdl.evaluate(nodes[nd].affinities[0]))
+    for key in nodesol:
+      print(key,nodesol[key])
