@@ -11,7 +11,7 @@ parser.add_argument("--seed", type=int, nargs='?', const=1, help="seed for the R
 args = parser.parse_args()
 
 
-VERBOSE=True
+VERBOSE=False
 SAVE=True
 INTERACTIVE=False
 
@@ -21,8 +21,8 @@ NODENUM=args.nodes
 CONTAINERNUM=args.pods
 
 if args.pods>args.nodes*args.capability:
-  args.capability=1+int(args.pods/args.nodes)
-  print("WARNING! Insufficiant capability detected. Increasing quota...")
+#  args.capability=1+int(args.pods/args.nodes)
+  print("WARNING! Insufficiant capability detected.")
 DEFAULTSIZE=args.capability
 
 sol=Solver()
@@ -107,7 +107,7 @@ class node:
           cntantifound=1
           for aAK in affinities.keys():
             if aAK==aV:
-              print(cntfound,cntantifound,"antifound",aK,aV,self.affinitySet[cntfound],"!=",self.affinitySet[cntantifound])
+#              print(cntfound,cntantifound,"antifound",aK,aV,self.affinitySet[cntfound],"!=",self.affinitySet[cntantifound])
               if VERBOSE==True:
                 print('sol.add(self.affinitySet['+str(cntfound)+']!=self.affinitySet['+str(cntantifound)+']')
               sol.add(self.affinitySet[cntfound]!=self.affinitySet[cntantifound])
@@ -128,8 +128,7 @@ class container:
     self.locations=[]
     self.affinities=[]
     self.name=name
-    if VERBOSE==True:
-      print('Container',self.name)
+    print('Container',self.name,end='')
     for i in range(0,len(nodes)):
       self.locations.append(Const(str(name)+'_'+str(i),BoolSort()))
       addBit(str(name)+'_'+str(i))
@@ -138,7 +137,7 @@ class container:
     for aAK in affinities.keys():
       for aA in affs:
         if aA==aAK:
-          print(cnt,aA,aAK)
+#          print(cnt,aA,aAK)
           self.affinities.append(cnt)
           break
       cnt=cnt+1
@@ -150,13 +149,13 @@ class container:
     if VERBOSE==True:
       print("  "+expr)
     eval(expr)
-    print(self.affinities)
+    print("  ",self.affinities)
     for i in range(0,len(nodes)):
       expr='sol.add('
       expr=expr+'Implies(self.node==nodes['+str(i)+'].node,And(self.locations['+str(i)+'],'
       for a in self.affinities:
-        print("a",a)
-        expr=expr+'nodes['+str(i)+'].affinitySet[0]==nodes['+str(i)+'].affinitySet['+str(a)+'],'
+#        print("a",a)
+        expr=expr+'nodes['+str(i)+'].affinitySet[0]==nodes['+str(i)+'].affinitySet['+str(a+1)+'],'
       for j in range(0,len(nodes)):
         if i!=j:
           expr=expr+'Not(self.locations['+str(j)+'])'
@@ -167,7 +166,7 @@ class container:
       expr=expr+')))'
       if VERBOSE==True:
         print("  "+expr)
-        eval(expr)
+      eval(expr)
 
 def adder(curN,curC,left):
   global X
@@ -258,14 +257,41 @@ for i in range(0,NODENUM):
 for i in range(0,CONTAINERNUM):
    zaffs=[]
    j=random.randint(1,4)*random.randint(1,4)
-   if j>11:
-     j=1
+   if j>7:
+     j=6
+   elif j>6:
+     j=5
+   elif j>4:
+      j=4
    elif j>2:
-     j=0
+     j=3
+   elif j>1:
+     j=2
+   else:
+    j=1
    for k in range(0,j):
      l=random.choice(list(affinities.values()))
-     zaffs.append(str(l))
-   print(zaffs)
+     found=False
+     print("checking ",l,zaffs)
+     for aA in antiAffinities:
+        aK=list(aA.keys())[0]
+        aV=list(aA.values())[0]
+        if aK==l:
+          for aF in zaffs:
+            print("+"+aF)
+            if aF==aV:
+              found=True
+#              print("contradiction",l,zaffs)
+              break
+        if aV==l:
+          for aF in zaffs:
+            if aF==aK:
+              found=True
+#              print("contradiction",l,zaffs)
+              break
+     if found==False:
+       zaffs.append(str(l))
+     print("final",zaffs)
    zC=container('C'+str(i),zaffs)
    containers.append(zC)
 
