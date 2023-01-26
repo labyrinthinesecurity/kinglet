@@ -19,6 +19,10 @@ rand=False
 
 NODENUM=args.nodes
 CONTAINERNUM=args.pods
+
+if args.pods>args.nodes*args.capability:
+  args.capability=1+int(args.pods/args.nodes)
+  print("WARNING! Insufficiant capability detected. Increasing quota...")
 DEFAULTSIZE=args.capability
 
 sol=Solver()
@@ -30,38 +34,39 @@ aC['name']='False'
 aC['value']=false
 registers.append(aC)
 NodeSort=DeclareSort('Node')
-AffinitySort=DeclareSort('Affinity')
 
-up,down,white,black,small,big,far,close,old,aged,jupiter,venus,mars,mercury,soft,good,cat,dog,bird,snake,camel=Consts('up down white black small big far close old aged jupiter venus mars mercury soft good cat dog bird snake camel',AffinitySort)
 affinities={}
-affinities['up']=up
-affinities['down']=down
-affinities['white']=white
-affinities['black']=black
-affinities['small']=small
-affinities['big']=big
-affinities['far']=far
-affinities['close']=close
+affinities['up']='up'
+affinities['down']='down'
+affinities['white']='white'
+affinities['black']='black'
+affinities['small']='small'
+affinities['big']='big'
+affinities['far']='far'
+affinities['close']='close'
 
-affinities['jupiter']=jupiter
-affinities['venus']=venus
-affinities['mars']=mars
-affinities['mercury']=mercury
+affinities['jupiter']='jupiter'
+affinities['venus']='venus'
+affinities['mars']='mars'
+affinities['mercury']='mercury'
 
-affinities['old']=old
-affinities['aged']=aged
-affinities['soft']=soft
-affinities['good']=good
+affinities['old']='old'
+affinities['aged']='aged'
+affinities['soft']='soft'
+affinities['good']='good'
 
-affinities['cat']=cat
-affinities['dog']=dog
-affinities['bird']=bird
-affinities['snake']=snake
-affinities['camel']=camel
+affinities['cat']='cat'
+affinities['dog']='dog'
+affinities['bird']='bird'
+affinities['snake']='snake'
+affinities['camel']='camel'
 
-sol.add(up!=down)   # anti affinity
-sol.add(white!=black) # anti affinity
-sol.add(big!=small) # anti affinity
+direction={'up': 'down'}
+color={'white': 'black'}
+size={'big': 'small'}
+distance={'far': 'close'}
+antiAffinities= [ direction, color, size, distance ]
+
 nodes=[]
 containers=[]
 digits = "0123456789ABCDEF"
@@ -70,23 +75,45 @@ class node:
   node=None
   size=None
   max_size=None
-  affinities=None
   name=None
+  affinitySet=None
+  AffinitySort=None
 
   def __init__(self,name,msize):
     global sol
     global affinities
+    global antiAffinities
     self.node=Const('node_'+str(name),NodeSort)
     self.name=name
     self.max_size=msize
-    self.affinities=[]
-    aA=Const('affinity_n'+str(name),AffinitySort)
-    self.affinities.append(aA)
+    self.affinitySet=[]
+    self.AffinitySort=DeclareSort('Affinity_n'+str(name))
+    aA=Const('n'+str(name)+"_ground_affinity",self.AffinitySort)
+    self.affinitySet.append(aA)
+    for aAK in affinities.keys():
+      aA=Const('n'+str(name)+"_affinity_"+str(aAK),self.AffinitySort)
+      self.affinitySet.append(aA)
     self.size=BitVec('size_n'+str(node),16)
     sol.add(ULE(self.size,msize))
     sol.add(UGE(self.size,0))
     if VERBOSE==True:
-      print("sol.add(ULT("+self.name+".size,"+str(msize)+'))')
+      print("sol.add(ULE("+self.name+".size,"+str(msize)+'))')
+    for aA in antiAffinities:
+      aK=list(aA.keys())[0]
+      aV=list(aA.values())[0]
+      cntfound=1  # 0 is reserved for ground affinity!
+      for aAK in affinities.keys():
+        if aAK==aK:
+          cntantifound=1
+          for aAK in affinities.keys():
+            if aAK==aV:
+              print(cntfound,cntantifound,"antifound",aK,aV,self.affinitySet[cntfound],"!=",self.affinitySet[cntantifound])
+              if VERBOSE==True:
+                print('sol.add(self.affinitySet['+str(cntfound)+']!=self.affinitySet['+str(cntantifound)+']')
+              sol.add(self.affinitySet[cntfound]!=self.affinitySet[cntantifound])
+              break
+            cntantifound=cntantifound+1
+        cntfound=cntfound+1
 
 class container:
   node=None
@@ -107,43 +134,40 @@ class container:
       self.locations.append(Const(str(name)+'_'+str(i),BoolSort()))
       addBit(str(name)+'_'+str(i))
     self.node=Const('node_'+str(name),NodeSort)
-    for aA in affs:
-      nza=Const('affinity_c'+str(name)+'_'+aA,AffinitySort)
-      self.affinities.append(nza)
-      sol.add(nza==affinities[aA])
-      if VERBOSE==True:
-        print('  sol.add('+'affinity_c'+str(name)+'_'+aA+'==affinities['+aA+'])')
-    expr='sol.add(Or('
-    for i in range(0,len(nodes)):
-      if i>0:
-        expr=expr+','
-      expr=expr+'And(self.node==nodes['+str(i)+'].node,self.locations['+str(i)+'],'
-      for a in range(0,len(self.affinities)):
-        expr=expr+'Or('
-        for b in range(0,len(nodes[i].affinities)):
-          expr=expr+'self.affinities['+str(a)+']==nodes['+str(i)+'].affinities['+str(b)+']'
-          expr=expr+','
-          if b==len(nodes[i].affinities)-1:
-              expr=expr[:-1]
-        expr=expr+'),'
-      for j in range(0,len(nodes)):
-         if i!=j:
-          expr=expr+'Not(self.locations['+str(j)+'])'
-          if j<len(nodes):
-            expr=expr+','
-        if j==len(nodes)-1:
-          expr=expr[:-1]
-      expr=expr+')'
-    expr=expr+'))'
-    if VERBOSE==True:
-      print("  "+expr)
-    eval(expr)
+    cnt=0
+    for aAK in affinities.keys():
+      for aA in affs:
+        if aA==aAK:
+          print(cnt,aA,aAK)
+          self.affinities.append(cnt)
+          break
+      cnt=cnt+1
     expr='sol.add(Or('
     for i in range(0,len(nodes)):
       expr=expr+'self.node==nodes['+str(i)+'].node,'
     expr=expr[:-1]
     expr=expr+'))'
+    if VERBOSE==True:
+      print("  "+expr)
     eval(expr)
+    print(self.affinities)
+    for i in range(0,len(nodes)):
+      expr='sol.add('
+      expr=expr+'Implies(self.node==nodes['+str(i)+'].node,And(self.locations['+str(i)+'],'
+      for a in self.affinities:
+        print("a",a)
+        expr=expr+'nodes['+str(i)+'].affinitySet[0]==nodes['+str(i)+'].affinitySet['+str(a)+'],'
+      for j in range(0,len(nodes)):
+        if i!=j:
+          expr=expr+'Not(self.locations['+str(j)+'])'
+          if j<len(nodes):
+            expr=expr+','
+        if j==len(nodes)-1:
+          expr=expr[:-1]
+      expr=expr+')))'
+      if VERBOSE==True:
+        print("  "+expr)
+        eval(expr)
 
 def adder(curN,curC,left):
   global X
@@ -190,7 +214,8 @@ v1.0 (Godefroy the First)
 def int2str(x, base, logw):
     rez=str(x) if x < base else int2str(x//base, base, logw) + digits[x % base]
     return rez
-  def int2strwrapper(x,base,logw):
+
+def int2strwrapper(x,base,logw):
   rez=int2str(x,base,logw)
   prefix=''
   if len(rez)<logw:
@@ -226,7 +251,10 @@ for i in range(0,NODENUM):
      size=random.randint(3,6)
    else:
      size=DEFAULTSIZE
-   nodes.append(node(str(i),size))
+   zN=node(str(i),size)
+   nodes.append(zN)
+   for aN in nodes[:-1]:
+     sol.add(aN.name!=zN.name)
 for i in range(0,CONTAINERNUM):
    zaffs=[]
    j=random.randint(1,4)*random.randint(1,4)
@@ -240,8 +268,6 @@ for i in range(0,CONTAINERNUM):
    print(zaffs)
    zC=container('C'+str(i),zaffs)
    containers.append(zC)
-   for aC in containers[:-1]:
-     sol.add(aC.node!=zC.node)
 
 logc=1+int(math.floor(math.log(len(containers),2)))
 
@@ -253,7 +279,8 @@ C = [ [ [Const("C_%s_%s_%s" % (k, j, i), BoolSort()) for i in range(logc)] for j
 
 ZERO = [Const("ZERO_%s" % i, BoolSort()) for i in range(logc)]
 ONE = [Const("ONE_%s" % i, BoolSort()) for i in range(logc)]
- for i in range(logc):
+
+for i in range(logc):
   sol.add(ZERO[i]==False)
   if i>0:
     sol.add(ONE[i]==False)
@@ -264,11 +291,7 @@ print("")
 print("N=",len(nodes)," C=",len(containers)," logc="+str(logc),"SIZE=",DEFAULTSIZE,"seed=",str(args.seed))
 if VERBOSE==True:
   for aN in nodes:
-    print(aN.name,aN.max_size,end=' ')
-    for aA in aN.affinities:
-      print(aA,end='')
-    print('')
+    print("node ",aN.name,"size ",aN.max_size)
   for aC in containers:
     print(aC.name,aC.affinities)
 print("")
-    
