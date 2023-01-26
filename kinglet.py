@@ -31,10 +31,10 @@ for nd in range(len(nodes)):
 
 
 for nd in range(len(nodes)):
-  print("NODE",nd)
+#  print("NODE",nd)
   cnt=0
   for aA in nodes[nd].affinitySet:
-    print("  ","affinitySet["+str(cnt)+"]",nodes[nd].affinitySet[cnt])
+#    print("  ","affinitySet["+str(cnt)+"]",nodes[nd].affinitySet[cnt])
     cnt=cnt+1
 
 print("checking satisfiability...")
@@ -71,6 +71,8 @@ if sol.check()==sat:
       print("NODE",mdl.evaluate(nodes[nd].node),mdl.evaluate(nodes[nd].affinitySet[0]))
     for key in nodesol:
       print(key,nodesol[key])
+  if VERBOSE==True:
+    print(sol)
 else:
   print("unsat...")
   print(sol)
