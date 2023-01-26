@@ -29,6 +29,14 @@ for nd in range(len(nodes)):
       print(nd,stringOfBits,expr)
     eval(expr)
 
+
+for nd in range(len(nodes)):
+  print("NODE",nd)
+  cnt=0
+  for aA in nodes[nd].affinitySet:
+    print("  ","affinitySet["+str(cnt)+"]",nodes[nd].affinitySet[cnt])
+    cnt=cnt+1
+
 print("checking satisfiability...")
 print('')
 if sol.check()==sat:
@@ -47,8 +55,10 @@ if sol.check()==sat:
       for j in range(logc):
         print(" ",mdl.evaluate(C[nd][m-1][j]),end='')
       print('')
-      for aA in nodes[nd].affinities:
-        print("  affinities: ",aA,mdl.evaluate(aA),end=' ')
+      cnt=0
+      for aA in nodes[nd].affinitySet:
+        print("  affinitySet["+str(cnt)+"]",aA,mdl.evaluate(aA))
+        cnt=cnt+1
       print('')
     print('')
   for nc in range(m):
@@ -58,6 +68,9 @@ if sol.check()==sat:
     nodesol[zv]=nodesol[zv]+1
   if SAVE==True:
     for nd in range(len(nodes)):
-      print("NODE",mdl.evaluate(nodes[nd].node),mdl.evaluate(nodes[nd].affinities[0]))
+      print("NODE",mdl.evaluate(nodes[nd].node),mdl.evaluate(nodes[nd].affinitySet[0]))
     for key in nodesol:
       print(key,nodesol[key])
+else:
+  print("unsat...")
+  print(sol)
