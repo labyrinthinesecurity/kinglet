@@ -8,10 +8,10 @@ Kinglet simulates how the scheduler part of a Kubernetes orchestrator distribute
 ## Quickstart
 
 ```
-./kinglet.py --nodes 2 --pods 50 --camability 30
+./kinglet.py --nodes 2 --pods 50 --capability 30
 ```
 
-Places 50 pods on 2 nodes, each node can hold up to 30 pods. Affinities are set at random.
+Places 50 pods on 2 nodes, each node can hold up to 30 pods. Affinities and anti affinities are set at random.
 
 # Installation
 
@@ -38,7 +38,7 @@ Each time kinglet is run, it will attach random constraints to containers. The c
 - anti-affinity
 - no constraint at all for this container
 
-Please note that, as of today, the random generator is rather silly and may attach contradictory constraints to a container.
+The random generator wont attach contradictory constraints to a container (eg, no big and small constraints at the same time)
 
 ## Affinities
 
