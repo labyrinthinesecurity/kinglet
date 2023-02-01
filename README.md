@@ -69,9 +69,8 @@ Nodes and containers are specified in the common file **kingletcommon.py**
 
 - nodes have a hardcoded maximum capacity: *self.max_size*. By default, it is set to DEFAULTMAXSIZE.
 - the current capacity is expressed as a variable of type BitVector, *self.size*, which has a lower bound (UGE) set to 0 and and upper bound (ULT) set to self.max_size
-- nodes are also equipped with an AffinitySort variablr: *self.affinities[0]*
-- only the first item in the self.affinities list is used.
-
+- nodes are also equipped with a list of AffinitySorts : *self.affinitySet*
+- the first member of this list, affinitySet[0], is used to equate node constraints and pod constraints
 ### The container class
 
 Containers are equiped with a variable of type NodeSort, *self.node*, that is used to express to which node the container is scheduled. A constraint is placed on this variable to force it to be equal to an existing node expressed as a NodeSort
