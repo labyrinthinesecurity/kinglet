@@ -1,10 +1,17 @@
 ![alt text](https://github.com/labyrinthinesecurity/kinglet/blob/main/banner.png?raw=true)
 
 # Introduction
-
 Let the tiny king guide you through the intricacies of automated reasoning... Under His Enlightened Command, learn how Z3, a state-of-the-art SMT (Satisfiability Modulo Theories) solver leverages Bitvectors theory, Propositional logic theory and Equality theory to enforce memory constraints and to meet affinity and anti-affinity constraints on a Kubernetes-like cluster.
 
 Kinglet simulates how the scheduler part of a Kubernetes orchestrator distributes workloads over a cluster, in a provable way.
+
+## Quickstart
+
+```
+./kinglet.py --nodes 2 --pods 50 --camability 30
+```
+
+Places 50 pods on 2 nodes, each node can hold up to 30 pods. Affinities are set at random.
 
 # Installation
 
